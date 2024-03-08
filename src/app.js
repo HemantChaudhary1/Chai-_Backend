@@ -16,4 +16,12 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
+
+ // Routes import
+ import userRouter from "./routes/user.routes.js"
+
+//Routes Declaration
+app.use("/api/v1/users",userRouter)      // https://localhost:8000/api/v1/users then it passes control to user routes then our URL becomes https://localhost:8000/api/v1/users/register
+
+
 export {app}
