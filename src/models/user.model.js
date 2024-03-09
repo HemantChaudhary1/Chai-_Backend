@@ -71,7 +71,7 @@ userSchema.methods.generateAccessToken =  function (){
    return jwt.sign(
         {
              // PAYLOAD OR DATA
-            _id: this_id,
+            _id: this._id,
             email:this.email,
             username: this.username,
             fullName:this.fullName
@@ -88,7 +88,7 @@ userSchema.methods.generateRefreshToken =  function (){
     return jwt.sign(
         {
              // PAYLOAD OR DATA
-            _id: this_id,
+            _id: this._id,
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
