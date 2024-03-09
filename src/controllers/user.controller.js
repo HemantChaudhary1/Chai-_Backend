@@ -32,7 +32,7 @@ const registerUser = asyncHandler( async (req,res) =>{
       //check for email format is correct or not
   
   //***step3:-Check if user already exists (We can check using username or email)
-      const existedUser =  User.findOne({
+      const existedUser = await User.findOne({
          $or:[{ username }, { email }]
        })
        
@@ -42,8 +42,14 @@ const registerUser = asyncHandler( async (req,res) =>{
     
    //***step4:-check for required files --> Here check for images and avatar
       const avatarLocalPath = req.files?.avatar[0]?.path;  // this we get using multer and middleware which we have written before registerUser route
-      const coverImageLocalPath = req.files?.coverImage[0]?.path;
-
+    //   const coverImageLocalPath = req.files?.coverImage[0]?.path;
+      let coverImageLocalPath;    // check if coverImagePath is empty or not 
+      if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+         coverImageLocalPath = req.files.coverImage[0].path
+      }
+      
+    //   console.log("req.files:", req.files);
+    //  console.log("avatarLocalPath:", avatarLocalPath); 
        //check for avatar because it is required
        if(!avatarLocalPath){
         throw new ApiError(400,"Avatar file is required");
@@ -52,11 +58,14 @@ const registerUser = asyncHandler( async (req,res) =>{
    //***step5:-upload them to cloudinary -->check if avatar is uploaded or not successfully
       const avatar = await uploadOnCloudinary(avatarLocalPath)
       const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-
+        
        //check if avatar is uploaded or not successfully
-       if(!avatar){
-        throw new ApiError(400,"Avatar file is required");
-       }
+       if (!avatar) {
+        const errorMessage = req.files?.avatar[0]?.originalname
+          ? "Error uploading avatar file"
+          : "Avatar file is required";
+        throw new ApiError(400, errorMessage);
+      }
    
         
    //***step6:-create user object --> Create entry in db
@@ -86,5 +95,5 @@ const registerUser = asyncHandler( async (req,res) =>{
 
 } )
 
-export {registerUser,}
+export {registerUser}
 
